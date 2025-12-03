@@ -9,11 +9,27 @@ import adminRoutes from "./routes/admin.js";
 dotenv.config();
 const app = express();
 
+const defaultAllowed = [
+  "http://localhost:5173",
+  "https://exam-platform-three.vercel.app",
+];
+const envAllowed = (process.env.CLIENT_URL || process.env.CLIENT_URLS || "")
+  .split(",")
+  .map((o) => o.trim())
+  .filter(Boolean);
+const allowedOrigins = [...new Set([...defaultAllowed, ...envAllowed])];
+
 // Middleware
 app.use(express.json());
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true); // allow non-browser (server-to-server)
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error("Not allowed by CORS"));
+    },
     credentials: true,
   })
 );
