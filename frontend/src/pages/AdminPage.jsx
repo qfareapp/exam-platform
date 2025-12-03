@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../api";
 
-const ADMIN_SECRET = "admin-123"; // same as .env ADMIN_SECRET (for dev only)
+const ADMIN_SECRET = import.meta.env.VITE_ADMIN_SECRET || "admin-123"; // must match backend ADMIN_SECRET
 
 export default function AdminPage() {
   const [file, setFile] = useState(null);
