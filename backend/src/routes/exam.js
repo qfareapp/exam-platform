@@ -32,7 +32,7 @@ router.post("/start", authMiddleware, async (req, res) => {
   try {
     const user = req.user;
     const config =
-      (await ExamConfig.findOne()) ||
+      (await ExamConfig.findOne().sort({ updatedAt: -1 })) ||
       (await ExamConfig.create({ cutoff: 0, durationMinutes: DEFAULT_EXAM_DURATION_MIN }));
     const durationMinutes = config.durationMinutes || DEFAULT_EXAM_DURATION_MIN;
 
@@ -73,7 +73,7 @@ router.post("/submit", authMiddleware, async (req, res) => {
     }
 
     const config =
-      (await ExamConfig.findOne()) ||
+      (await ExamConfig.findOne().sort({ updatedAt: -1 })) ||
       (await ExamConfig.create({ cutoff: 0, durationMinutes: DEFAULT_EXAM_DURATION_MIN }));
     const now = new Date();
     const diffMs = now - user.startedAt;
