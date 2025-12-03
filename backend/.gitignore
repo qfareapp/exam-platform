@@ -1,0 +1,26 @@
+# Node modules (do NOT commit dependencies)
+node_modules/
+
+# Environment variables (must stay private)
+.env
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# Temporary files
+.DS_Store
+Thumbs.db
+
+# Build or compiled output (if later added)
+dist/
+build/
+
+# Coverage reports (if tests added)
+coverage/
+
+# IDE/Editor folders
+.vscode/
+.idea/
