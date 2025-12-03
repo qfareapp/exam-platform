@@ -18,6 +18,7 @@ export default function AdminPage() {
   const [editText, setEditText] = useState("");
   const [editOptions, setEditOptions] = useState(["", "", "", ""]);
   const [editCorrectIndex, setEditCorrectIndex] = useState(0);
+  const [durationMinutes, setDurationMinutes] = useState(20);
 
   const adminHeaders = {
     "x-admin-secret": ADMIN_SECRET,
@@ -38,6 +39,7 @@ export default function AdminPage() {
   const loadConfig = async () => {
     const res = await api.get("/admin/config", { headers: adminHeaders });
     setCutoff(res.data.cutoff ?? 0);
+    setDurationMinutes(res.data.durationMinutes ?? 20);
   };
 
   useEffect(() => {
@@ -116,7 +118,7 @@ export default function AdminPage() {
     try {
       await api.post(
         "/admin/config",
-        { cutoff: Number(cutoff) || 0 },
+        { cutoff: Number(cutoff) || 0, durationMinutes: Number(durationMinutes) || 20 },
         { headers: adminHeaders }
       );
       await loadConfig();
@@ -152,10 +154,20 @@ export default function AdminPage() {
         <div className="grid two-col">
           <section className="card">
             <div className="section-heading">
-              <h3 style={{ margin: 0 }}>Pass Cutoff</h3>
-              <span className="tag">Score</span>
+              <h3 style={{ margin: 0 }}>Exam Settings</h3>
+              <span className="tag">Config</span>
             </div>
             <form onSubmit={handleSaveCutoff} className="form">
+              <label className="field">
+                <span>Exam duration (minutes)</span>
+                <input
+                  className="input"
+                  type="number"
+                  min={1}
+                  value={durationMinutes}
+                  onChange={(e) => setDurationMinutes(e.target.value)}
+                />
+              </label>
               <label className="field">
                 <span>Minimum correct answers to pass</span>
                 <input
@@ -168,10 +180,10 @@ export default function AdminPage() {
                 />
               </label>
               <button type="submit" className="btn btn-primary">
-                {savingCutoff ? "Saving..." : "Save Cutoff"}
+                {savingCutoff ? "Saving..." : "Save Settings"}
               </button>
               <p className="helper">
-                Candidates with scores below this number will be marked as fail.
+                Duration controls the exam timer; cutoff determines pass/fail.
               </p>
             </form>
           </section>

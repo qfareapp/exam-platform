@@ -6,7 +6,7 @@ import ExamConfig from "../models/ExamConfig.js";
 import { authMiddleware } from "../middleware/auth.js";
 
 const router = express.Router();
-const EXAM_DURATION_MIN = 20;
+const DEFAULT_EXAM_DURATION_MIN = 20;
 
 // GET /api/exam/questions
 router.get("/questions", authMiddleware, async (req, res) => {
@@ -31,6 +31,10 @@ router.get("/questions", authMiddleware, async (req, res) => {
 router.post("/start", authMiddleware, async (req, res) => {
   try {
     const user = req.user;
+    const config =
+      (await ExamConfig.findOne()) ||
+      (await ExamConfig.create({ cutoff: 0, durationMinutes: DEFAULT_EXAM_DURATION_MIN }));
+    const durationMinutes = config.durationMinutes || DEFAULT_EXAM_DURATION_MIN;
 
     if (user.hasAttempted) {
       return res
@@ -45,7 +49,7 @@ router.post("/start", authMiddleware, async (req, res) => {
 
     res.json({
       startedAt: user.startedAt,
-      durationMinutes: EXAM_DURATION_MIN,
+      durationMinutes,
     });
   } catch (err) {
     console.error("Start exam error:", err);
@@ -68,11 +72,14 @@ router.post("/submit", authMiddleware, async (req, res) => {
       return res.status(400).json({ message: "Exam already submitted" });
     }
 
+    const config =
+      (await ExamConfig.findOne()) ||
+      (await ExamConfig.create({ cutoff: 0, durationMinutes: DEFAULT_EXAM_DURATION_MIN }));
     const now = new Date();
     const diffMs = now - user.startedAt;
     const diffMinutes = diffMs / 1000 / 60;
 
-    // Even if it's > 20 min, we still accept and score.
+    const durationMinutes = config.durationMinutes || DEFAULT_EXAM_DURATION_MIN;
     const questions = await Question.find().limit(10);
 
     let score = 0;
@@ -97,7 +104,6 @@ router.post("/submit", authMiddleware, async (req, res) => {
       });
     });
 
-    const config = (await ExamConfig.findOne()) || (await ExamConfig.create({ cutoff: 0 }));
     const passed = score >= (config.cutoff ?? 0);
 
     // Save ExamAttempt
@@ -122,8 +128,8 @@ router.post("/submit", authMiddleware, async (req, res) => {
       passed,
       durationMinutes: diffMinutes,
       message:
-        diffMinutes > EXAM_DURATION_MIN
-          ? "Submitted after time; auto-closure would have happened at 20 minutes."
+        diffMinutes > durationMinutes
+          ? `Submitted after time; auto-closure would have happened at ${durationMinutes} minutes.`
           : "Submitted within time.",
     });
   } catch (err) {

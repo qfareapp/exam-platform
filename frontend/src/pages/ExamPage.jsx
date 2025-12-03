@@ -2,12 +2,11 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api";
 
-const EXAM_DURATION_MIN = 20;
-
 export default function ExamPage() {
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
-  const [timeLeft, setTimeLeft] = useState(EXAM_DURATION_MIN * 60);
+  const [timeLeft, setTimeLeft] = useState(20 * 60);
+  const [durationMinutes, setDurationMinutes] = useState(20);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
@@ -15,7 +14,10 @@ export default function ExamPage() {
   useEffect(() => {
     const init = async () => {
       try {
-        await api.post("/exam/start");
+        const startRes = await api.post("/exam/start");
+        const duration = startRes.data?.durationMinutes || 20;
+        setDurationMinutes(duration);
+        setTimeLeft(duration * 60);
         const res = await api.get("/exam/questions");
         setQuestions(res.data.questions);
         setLoading(false);
@@ -135,6 +137,7 @@ export default function ExamPage() {
             <h1 className="card-title">Attempt all questions</h1>
             <p className="muted">
               Timer runs in the background. Answers will auto-submit when time ends.
+              Duration: {durationMinutes} minutes.
             </p>
           </div>
           <div className={`timer-chip ${timeLeft < 60 ? "danger" : ""}`}>

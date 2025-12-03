@@ -119,21 +119,26 @@ router.get("/results", adminMiddleware, async (req, res) => {
 router.get("/config", adminMiddleware, async (_req, res) => {
   const existing = await ExamConfig.findOne();
   if (existing) return res.json(existing);
-  const created = await ExamConfig.create({ cutoff: 0 });
+  const created = await ExamConfig.create({ cutoff: 0, durationMinutes: 20 });
   res.json(created);
 });
 
 // POST /api/admin/config
 router.post("/config", adminMiddleware, async (req, res) => {
-  const { cutoff } = req.body;
+  const { cutoff, durationMinutes } = req.body;
   const value = typeof cutoff === "number" && cutoff >= 0 ? cutoff : 0;
+  const duration =
+    typeof durationMinutes === "number" && durationMinutes > 0
+      ? durationMinutes
+      : 20;
   const existing = await ExamConfig.findOne();
   if (existing) {
     existing.cutoff = value;
+    existing.durationMinutes = duration;
     await existing.save();
     return res.json(existing);
   }
-  const created = await ExamConfig.create({ cutoff: value });
+  const created = await ExamConfig.create({ cutoff: value, durationMinutes: duration });
   res.json(created);
 });
 
