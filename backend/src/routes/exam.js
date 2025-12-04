@@ -11,7 +11,7 @@ const DEFAULT_EXAM_DURATION_MIN = 20;
 // GET /api/exam/questions
 router.get("/questions", authMiddleware, async (req, res) => {
   try {
-    const questions = await Question.find().limit(10);
+    const questions = await Question.find().sort({ createdAt: 1 });
 
     // Don't send correct answers to client
     const safeQuestions = questions.map((q) => ({
@@ -80,7 +80,7 @@ router.post("/submit", authMiddleware, async (req, res) => {
     const diffMinutes = diffMs / 1000 / 60;
 
     const durationMinutes = config.durationMinutes || DEFAULT_EXAM_DURATION_MIN;
-    const questions = await Question.find().limit(10);
+    const questions = await Question.find().sort({ createdAt: 1 });
 
     let score = 0;
     const attemptAnswers = [];
