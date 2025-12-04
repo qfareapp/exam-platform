@@ -61,7 +61,11 @@ export default function ResultPage() {
       }
       ctx.fillText(displayName, canvas.width / 2, canvas.height * 0.53);
 
-      const dateText = `Date: ${new Date().toLocaleDateString()}`;
+      const dateText = `Date: ${new Date().toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      })}`;
       ctx.font = `${Math.round(80 * scale)}px ${nameFontFamily}`;
       ctx.fillText(dateText, canvas.width / 2, canvas.height * 0.7);
 
