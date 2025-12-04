@@ -26,47 +26,44 @@ export default function ResultPage() {
       const ctx = canvas.getContext("2d");
       const bg = new Image();
       bg.crossOrigin = "anonymous";
-      bg.src = "/preview.jpg";
+      bg.src = "/certificate.png";
 
       await new Promise((resolve, reject) => {
         bg.onload = resolve;
         bg.onerror = () =>
-          reject(new Error("Certificate template (preview.jpg) not found or failed to load"));
+          reject(new Error("Certificate template (certificate.png) not found or failed to load"));
       });
 
-      canvas.width = bg.naturalWidth || 1600;
-      canvas.height = bg.naturalHeight || 1131;
+      canvas.width = bg.naturalWidth || 4871;
+      canvas.height = bg.naturalHeight || 3444;
       ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
 
-      // Overlay text
-      ctx.fillStyle = "#0f172a";
+      // Overlay only name and date on top of the provided template
+      const baseWidth = 4871;
+      const scale = canvas.width / baseWidth;
+      ctx.fillStyle = "#1f2937";
       ctx.textAlign = "center";
 
-      ctx.font = "48px Manrope, sans-serif";
-      ctx.fillText("Certificate of Achievement", canvas.width / 2, canvas.height * 0.32);
-
-      ctx.font = "36px Manrope, sans-serif";
-      ctx.fillText("Awarded to", canvas.width / 2, canvas.height * 0.42);
-
-      ctx.font = "54px Manrope, sans-serif";
       const displayName =
         result.name?.trim() ||
         result.email?.split("@")[0] ||
         result.phone ||
         "Candidate";
-      ctx.fillText(displayName, canvas.width / 2, canvas.height * 0.5);
 
-      ctx.font = "28px Manrope, sans-serif";
-      const msg =
-        "Congratulations on successfully completing the CANDO & 5S Visual Management Training.";
-      ctx.fillText(msg, canvas.width / 2, canvas.height * 0.6);
-      ctx.font = "24px Manrope, sans-serif";
-      const msg2 = "Your dedication and active participation are truly appreciated.";
-      ctx.fillText(msg2, canvas.width / 2, canvas.height * 0.65);
+      // Scale name text so it fits within the center ribbon area
+      const nameFontFamily = '"Times New Roman", "Georgia", serif';
+      let nameFontSize = Math.round(180 * scale);
+      const maxNameWidth = canvas.width * 0.7;
+      ctx.font = `bold ${nameFontSize}px ${nameFontFamily}`;
+      while (ctx.measureText(displayName).width > maxNameWidth && nameFontSize > 48 * scale) {
+        nameFontSize -= 2;
+        ctx.font = `bold ${Math.round(nameFontSize)}px ${nameFontFamily}`;
+      }
+      ctx.fillText(displayName, canvas.width / 2, canvas.height * 0.53);
 
-      ctx.font = "22px Manrope, sans-serif";
-      const date = new Date().toLocaleDateString();
-      ctx.fillText(`Date: ${date}`, canvas.width / 2, canvas.height * 0.72);
+      const dateText = `Date: ${new Date().toLocaleDateString()}`;
+      ctx.font = `${Math.round(80 * scale)}px ${nameFontFamily}`;
+      ctx.fillText(dateText, canvas.width / 2, canvas.height * 0.7);
 
       const baseName = (displayName || "candidate").replace(/[^a-z0-9]/gi, "_");
 
@@ -76,7 +73,9 @@ export default function ResultPage() {
       link.click();
     } catch (err) {
       console.error("Certificate generation failed", err);
-      alert(err.message || "Unable to generate certificate. Please ensure preview.jpg is present.");
+      alert(
+        err.message || "Unable to generate certificate. Please ensure certificate.png is present."
+      );
     }
   }, [result]);
 

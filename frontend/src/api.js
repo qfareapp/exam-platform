@@ -1,10 +1,15 @@
 import axios from "axios";
 
-const base =
-  (import.meta.env.VITE_API_BASE_URL || "").replace(/\/+$/, "");
+const envBase = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/+$/, "");
+// Avoid double `/api` when the env already includes it.
+const baseURL = envBase
+  ? envBase.endsWith("/api")
+    ? envBase
+    : `${envBase}/api`
+  : "/api";
 
 const api = axios.create({
-  baseURL: `${base}/api`,
+  baseURL,
 });
 
 api.interceptors.request.use((config) => {
