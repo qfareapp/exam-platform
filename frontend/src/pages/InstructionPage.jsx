@@ -43,7 +43,7 @@ export default function InstructionPage() {
             <InstructionSection
               title="3. Duration"
               points={[
-                "Total exam duration is 20 minutes.",
+                "Total exam duration is 10 minutes.",
                 "The timer starts immediately after you enter the exam page.",
                 "When the timer ends, your answers will be auto-submitted even if you have not clicked Submit.",
               ]}
