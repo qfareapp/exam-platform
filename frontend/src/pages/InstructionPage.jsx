@@ -35,7 +35,7 @@ export default function InstructionPage() {
             <InstructionSection
               title="2. Exam Format"
               points={[
-                "The exam contains 10 Multiple Choice Questions (MCQs).",
+                "The exam contains 20 Multiple Choice Questions (MCQs).",
                 "Each question has 4 options and only one option is correct.",
                 "There is no negative marking.",
               ]}
