@@ -26,12 +26,12 @@ export default function ResultPage() {
       const ctx = canvas.getContext("2d");
       const bg = new Image();
       bg.crossOrigin = "anonymous";
-      bg.src = "/certificate.png";
+      bg.src = "/cert.png";
 
       await new Promise((resolve, reject) => {
         bg.onload = resolve;
         bg.onerror = () =>
-          reject(new Error("Certificate template (certificate.png) not found or failed to load"));
+          reject(new Error("Certificate template (cert.png) not found or failed to load"));
       });
 
       canvas.width = bg.naturalWidth || 4871;
@@ -72,13 +72,13 @@ export default function ResultPage() {
       const baseName = (displayName || "candidate").replace(/[^a-z0-9]/gi, "_");
 
       const link = document.createElement("a");
-      link.download = `${baseName}-certificate.png`;
+      link.download = `${baseName}-cert.png`;
       link.href = canvas.toDataURL("image/png");
       link.click();
     } catch (err) {
       console.error("Certificate generation failed", err);
       alert(
-        err.message || "Unable to generate certificate. Please ensure certificate.png is present."
+        err.message || "Unable to generate certificate. Please ensure cert.png is present."
       );
     }
   }, [result]);
